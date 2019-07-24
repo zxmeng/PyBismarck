@@ -7,8 +7,8 @@ AS $$
 $$ LANGUAGE plpythonu;
 
 
-DROP FUNCTION IF EXISTS dense_svm_agg(double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION dense_svm_agg(x double precision[], y integer, linear_model double precision[])
+DROP FUNCTION IF EXISTS sparse_logit_agg(integer[], double precision[], integer, double precision[]) CASCADE;
+CREATE FUNCTION sparse_logit_agg(k integer[], v double precision[], y integer, linear_model double precision[])
     RETURNS double precision[]
 AS $$
     import numpy as np
@@ -17,42 +17,44 @@ AS $$
     lr = linear_model[1]
     w = linear_model[2:]
 
-    wx = np.dot(x, w)
-    c = lr * y
+    wx = 0.0
+    for i in range(len(k)):
+        wx += v[i] * w[k[i]]
 
-    flag = False
-    if (1 - y * wx > 0):
-        flag = True
-
+    sig = 1.0 / (1.0 + np.exp(- wx * y))
+    c = lr * y * sig
     u = mu * lr
-    for i in range(len(w)):
-        if flag:
-            w[i] += x[i] * c
 
-        if w[i] > u:
-            w[i] -= u
-        elif w[i] < -u:
-            w[i] += u
+    for i in range(len(k)):
+        w[k[i]] += v[i] * c
+        
+        if w[k[i]] > u:
+            w[k[i]] -= u
+        elif w[k[i]] < -u:
+            w[k[i]] += u
         else:
-            w[i] = 0.0
-
+            w[k[i]] = 0.0
+            
     return [mu, lr] + w
 $$ LANGUAGE plpythonu;
 
-DROP FUNCTION IF EXISTS dense_svm_loss(double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION dense_svm_loss(x double precision[], y integer, linear_model double precision[])
+DROP FUNCTION IF EXISTS sparse_logit_loss(integer[], double precision[], integer, double precision[]) CASCADE;
+CREATE FUNCTION sparse_logit_loss(k integer[], v double precision[], y integer, linear_model double precision[])
     RETURNS double precision
 AS $$
     import numpy as np
     
     w = linear_model[2:]
-    wx = np.dot(x, w)
-    
-    return max(0, 1 - y * wx)
+    wx = 0.0
+    for i in range(len(k)):
+        wx += v[i] * w[k[i]]
+
+    return np.log(1.0 + np.exp(- y * wx))
+
 $$ LANGUAGE plpythonu;
 
-DROP FUNCTION IF EXISTS dense_svm_agg_iteration(text, integer) CASCADE;
-CREATE FUNCTION dense_svm_agg_iteration(data_table text, model_id integer)
+DROP FUNCTION IF EXISTS sparse_logit_agg_iteration(text, integer) CASCADE;
+CREATE FUNCTION sparse_logit_agg_iteration(data_table text, model_id integer)
 RETURNS double precision 
 AS $$
 DECLARE
@@ -60,7 +62,7 @@ DECLARE
     loss double precision;
     BEGIN
     -- grad
-    EXECUTE 'SELECT dense_svm_agg(vec, labeli, 
+    EXECUTE 'SELECT sparse_logit_agg(k, v, label, 
                             (SELECT parms 
                              FROM linear_model 
                              WHERE mid = ' || model_id || ')) '
@@ -69,7 +71,7 @@ DECLARE
     -- update
     UPDATE linear_model SET parms = weight_vector WHERE mid = model_id;
     -- loss
-    EXECUTE 'SELECT sum(dense_svm_loss(vec, labeli, 
+    EXECUTE 'SELECT sum(sparse_logit_loss(k, v, label, 
                            (SELECT parms
                             FROM linear_model 
                             WHERE mid = ' || model_id || '))) '
@@ -79,23 +81,21 @@ DECLARE
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
-DROP FUNCTION IF EXISTS dense_svm_train_agg(text, integer, integer) CASCADE;
-CREATE FUNCTION dense_svm_train_agg(data_table text, model_id integer, iteration integer)
+CREATE FUNCTION sparse_logit_train_agg(data_table text, model_id integer, iteration integer)
 RETURNS VOID 
 AS $$
 DECLARE
     loss double precision;
     BEGIN
     FOR i IN 1..iteration LOOP
-        SELECT dense_svm_agg_iteration(data_table, model_id) INTO loss;
+        SELECT sparse_logit_agg_iteration(data_table, model_id) INTO loss;
         RAISE NOTICE '#iter: %, loss value: %', i, loss;
     END LOOP;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
-
-DROP FUNCTION IF EXISTS dense_svm(text, integer, integer, integer, double precision, double precision, boolean) CASCADE;
-CREATE FUNCTION dense_svm(
+DROP FUNCTION IF EXISTS sparse_logit(text, integer, integer, integer, double precision, double precision, boolean) CASCADE;
+CREATE FUNCTION sparse_logit(
     data_table text,
     model_id integer,
     ndims integer,
@@ -111,7 +111,7 @@ DECLARE
 BEGIN
     -- query for ntuples and initialize the model table 
     EXECUTE 'SELECT count(*) FROM ' || data_table
-        INTO ntuples;   
+        INTO ntuples;  
     RAISE NOTICE '#tuples: %', ntuples; 
     SELECT alloc_float8_array(mu, lr, ndims) INTO initw;
     DELETE FROM linear_model WHERE mid = model_id;
@@ -127,16 +127,15 @@ BEGIN
         tmp_table := data_table;
     END IF;
 
-    PERFORM dense_svm_train_agg(tmp_table, model_id, iteration);
+    PERFORM sparse_logit_train_agg(tmp_table, model_id, iteration);
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
-
-DROP FUNCTION IF EXISTS dense_svm(text, integer, integer) CASCADE;
-CREATE FUNCTION dense_svm(
+DROP FUNCTION IF EXISTS sparse_logit(text, integer, integer) CASCADE;
+CREATE FUNCTION sparse_logit(
     data_table text,
     model_id integer,
     ndims integer)
 RETURNS VOID AS $$
-    SELECT dense_svm($1, $2, $3, 20, 1e-2, 5e-5, 't');
+    SELECT sparse_logit($1, $2, $3, 20, 1e-2, 5e-5, 't');
 $$ LANGUAGE sql VOLATILE;
