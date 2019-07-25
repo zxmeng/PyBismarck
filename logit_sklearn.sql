@@ -1,9 +1,9 @@
-DROP FUNCTION IF EXISTS alloc_float8_array(double precision, integer) CASCADE;
-CREATE FUNCTION alloc_float8_array(mu double precision, n integer)
+DROP FUNCTION IF EXISTS alloc_float8_array(double precision, double precision, integer) CASCADE;
+CREATE FUNCTION alloc_float8_array(mu double precision, lr double precision, n integer)
 RETURNS double precision[]
 AS $$
     w = [0.0 for _ in range(n)]
-    return [mu] + w
+    return [mu, 0.0] + w
 $$ LANGUAGE plpythonu;
 
 
@@ -12,18 +12,22 @@ CREATE FUNCTION dense_logit_agg(x double precision[], y integer, linear_model do
     RETURNS double precision[]
 AS $$
     import numpy as np
+    from sklearn.linear_model import LogisticRegression
+    from sklearn.linear_model import SGDRegressor
 
-    lr = linear_model[0]
-    theta = linear_model[1:]
-    
-    z = np.dot(x, theta) 
-    h = 1 / (1 + np.exp(-z))
-    gradient = np.dot(x, (h - y))
+    mu = linear_model[0]
+    lr = linear_model[1]
+    w = linear_model[2:]
 
-    for i in range(len(theta)):
-        theta[i] -= lr * gradient[i]
+    # model = LogisticRegression(penalty='l1', C=mu, random_state=0, max_iter=1)
+    model = SGDRegressor(loss='squared_loss', penalty='l1', random_state=0, warm_start=True)
 
-    return [lr] + theta
+    model.partial_fit([x], [y])
+    w = model.coef_
+    lr = model.intercept_[0]
+    print(model.coef_)
+            
+    return [mu, lr] + list(w.T)
 $$ LANGUAGE plpythonu;
 
 DROP FUNCTION IF EXISTS dense_logit_loss(double precision[], integer, double precision[]) CASCADE;
@@ -32,12 +36,10 @@ CREATE FUNCTION dense_logit_loss(x double precision[], y integer, linear_model d
 AS $$
     import numpy as np
     
-    lr = linear_model[0]
-    theta = linear_model[1:]
-    
-    z = np.dot(x, theta)
-    
-    return np.log(1 + np.exp(- y * z))
+    w = linear_model[2:]
+    wx = np.dot(x, w)
+
+    return np.log(1.0 + np.exp(- y * wx))
 
 $$ LANGUAGE plpythonu;
 
@@ -82,13 +84,14 @@ DECLARE
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
-DROP FUNCTION IF EXISTS dense_logit(text, integer, integer, integer, double precision, boolean) CASCADE;
+DROP FUNCTION IF EXISTS dense_logit(text, integer, integer, integer, double precision, double precision, boolean) CASCADE;
 CREATE FUNCTION dense_logit(
     data_table text,
     model_id integer,
     ndims integer,
     iteration integer /* default 20 */,
     mu double precision /* default 1e-2 */,
+    lr double precision /* default 5e-5 */,
     is_shuffle boolean /* default 'true' */)
 RETURNS VOID AS $$
 DECLARE
@@ -100,7 +103,7 @@ BEGIN
     EXECUTE 'SELECT count(*) FROM ' || data_table
         INTO ntuples;  
     RAISE NOTICE '#tuples: %', ntuples; 
-    SELECT alloc_float8_array(mu, ndims) INTO initw;
+    SELECT alloc_float8_array(mu, lr, ndims) INTO initw;
     DELETE FROM linear_model WHERE mid = model_id;
     INSERT INTO linear_model VALUES (model_id, initw); 
     -- execute iterations
@@ -124,5 +127,5 @@ CREATE FUNCTION dense_logit(
     model_id integer,
     ndims integer)
 RETURNS VOID AS $$
-    SELECT dense_logit($1, $2, $3, 20, 5e-4, 't');
+    SELECT dense_logit($1, $2, $3, 20, 1e-2, 5e-5, 'f');
 $$ LANGUAGE sql VOLATILE;
