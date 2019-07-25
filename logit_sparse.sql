@@ -21,13 +21,13 @@ AS $$
     for i in range(len(k)):
         wx += v[i] * w[k[i]]
 
-    sig = 1.0 / (1.0 + np.exp(- wx * y))
+    sig = 1.0 / (1.0 + np.exp(wx * y))
     c = lr * y * sig
     u = mu * lr
 
     for i in range(len(k)):
         w[k[i]] += v[i] * c
-        
+
         if w[k[i]] > u:
             w[k[i]] -= u
         elif w[k[i]] < -u:
@@ -137,5 +137,6 @@ CREATE FUNCTION sparse_logit(
     model_id integer,
     ndims integer)
 RETURNS VOID AS $$
-    SELECT sparse_logit($1, $2, $3, 20, 1e-2, 5e-5, 't');
+    SELECT sparse_logit($1, $2, $3, 20, 1e-2, 5e-1, 't');
 $$ LANGUAGE sql VOLATILE;
+

@@ -18,7 +18,7 @@ AS $$
     w = linear_model[2:]
     wx = np.dot(x, w) 
 
-    sig = 1.0 / (1.0 + np.exp(- wx * y))
+    sig = 1.0 / (1.0 + np.exp(wx * y))
     c = lr * y * sig
     u = mu * lr
 
