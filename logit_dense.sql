@@ -20,7 +20,7 @@ AS $$
     z = np.dot(x, w) 
     h = 1 / (1 + np.exp(-z))
 
-    gradient = np.dot(x, (h - y_))
+    gradient = np.dot(x, (h - y))
     for i in range(len(w)):
         w[i] -= lr * gradient[i]
 
@@ -39,7 +39,7 @@ AS $$
     z = np.dot(x, w)
     h = 1 / (1 + np.exp(-z))
 
-    return np.log(1.0 + np.exp(- y * wx))
+    return np.log(1.0 + np.exp(- y * z))
 
 $$ LANGUAGE plpythonu;
 
@@ -127,5 +127,5 @@ CREATE FUNCTION dense_logit(
     model_id integer,
     ndims integer)
 RETURNS VOID AS $$
-    SELECT dense_logit($1, $2, $3, 20, 1e-2, 5e-5, 't');
+    SELECT dense_logit($1, $2, $3, 20, 1e-2, 5e-5, 'f');
 $$ LANGUAGE sql VOLATILE;
