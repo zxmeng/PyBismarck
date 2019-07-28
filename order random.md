@@ -105,3 +105,334 @@ iteration 99 	loss: 347530.068266 	improvement:  0.0
 iteration 100 	loss: 347530.068266 	improvement:  0.0
 --- Execution Time ---
 --- 120.233675003 seconds ---
+
+
+
+
+### dense-svm
+
+
+python bismarck_front.py dense-svm-spec.py
+A shuffled table __bismarck_shuffled_forest_12 is created for training
+iteration 1 	loss: 380607.183658 	improvement:  None
+iteration 2 	loss: 380635.460422 	improvement:  -7.42938267014e-05
+iteration 3 	loss: 380735.772562 	improvement:  -0.000263538609337
+iteration 4 	loss: 380813.85245 	improvement:  -0.000205076311831
+iteration 5 	loss: 380836.066173 	improvement:  -5.83322339855e-05
+iteration 6 	loss: 380775.186057 	improvement:  0.000159859113019
+iteration 7 	loss: 380761.510939 	improvement:  3.59138899139e-05
+iteration 8 	loss: 380778.638263 	improvement:  -4.49817640148e-05
+iteration 9 	loss: 380811.684966 	improvement:  -8.67871757717e-05
+iteration 10 	loss: 380779.803657 	improvement:  8.37193563346e-05
+iteration 11 	loss: 380786.059213 	improvement:  -1.64282791154e-05
+iteration 12 	loss: 380788.507477 	improvement:  -6.42949969883e-06
+iteration 13 	loss: 380799.500678 	improvement:  -2.88695704258e-05
+iteration 14 	loss: 380788.68572 	improvement:  2.84006615862e-05
+iteration 15 	loss: 380780.818385 	improvement:  2.06606337926e-05
+iteration 16 	loss: 380772.074156 	improvement:  2.29639425328e-05
+iteration 17 	loss: 380765.829407 	improvement:  1.64002271015e-05
+iteration 18 	loss: 380786.844211 	improvement:  -5.51908855391e-05
+iteration 19 	loss: 380786.53174 	improvement:  8.20591256514e-07
+iteration 20 	loss: 380770.628814 	improvement:  4.17633636865e-05
+iteration 21 	loss: 380787.393125 	improvement:  -4.40273235549e-05
+iteration 22 	loss: 380756.267968 	improvement:  8.17389402615e-05
+iteration 23 	loss: 380789.281109 	improvement:  -8.6704131276e-05
+iteration 24 	loss: 380793.127375 	improvement:  -1.01007716126e-05
+iteration 25 	loss: 380813.953658 	improvement:  -5.46918572521e-05
+iteration 26 	loss: 380766.228956 	improvement:  0.000125322879901
+iteration 27 	loss: 380770.605653 	improvement:  -1.14944450404e-05
+iteration 28 	loss: 380758.461579 	improvement:  3.18934134034e-05
+iteration 29 	loss: 380762.467745 	improvement:  -1.05215412742e-05
+iteration 30 	loss: 380789.879579 	improvement:  -7.19919542132e-05
+iteration 31 	loss: 380757.297852 	improvement:  8.55635309979e-05
+iteration 32 	loss: 380800.215295 	improvement:  -0.000112716009674
+iteration 33 	loss: 380802.668118 	improvement:  -6.44123195451e-06
+iteration 34 	loss: 380812.383607 	improvement:  -2.55131846319e-05
+iteration 35 	loss: 380804.655288 	improvement:  2.02942936199e-05
+iteration 36 	loss: 380814.173675 	improvement:  -2.49954570403e-05
+iteration 37 	loss: 380778.421674 	improvement:  9.38830627207e-05
+iteration 38 	loss: 380767.203968 	improvement:  2.94599291307e-05
+iteration 39 	loss: 380774.716942 	improvement:  -1.97311465555e-05
+iteration 40 	loss: 380775.640136 	improvement:  -2.42451604574e-06
+iteration 41 	loss: 380792.129084 	improvement:  -4.33035780232e-05
+iteration 42 	loss: 380798.350286 	improvement:  -1.63375270649e-05
+iteration 43 	loss: 380804.95793 	improvement:  -1.73520832116e-05
+iteration 44 	loss: 380787.882084 	improvement:  4.48414494623e-05
+iteration 45 	loss: 380793.690667 	improvement:  -1.52541164919e-05
+iteration 46 	loss: 380788.863619 	improvement:  1.26762796031e-05
+iteration 47 	loss: 380755.795585 	improvement:  8.68408649183e-05
+iteration 48 	loss: 380768.907757 	improvement:  -3.44372207226e-05
+iteration 49 	loss: 380768.800254 	improvement:  2.8232908405e-07
+iteration 50 	loss: 380764.896347 	improvement:  1.02526967478e-05
+iteration 51 	loss: 380758.667336 	improvement:  1.6359204955e-05
+iteration 52 	loss: 380772.802922 	improvement:  -3.71247891818e-05
+iteration 53 	loss: 380775.910414 	improvement:  -8.16101529085e-06
+iteration 54 	loss: 380793.149723 	improvement:  -4.52741581637e-05
+iteration 55 	loss: 380808.655792 	improvement:  -4.07204512615e-05
+iteration 56 	loss: 380802.690999 	improvement:  1.56634909062e-05
+iteration 57 	loss: 380800.725128 	improvement:  5.16244071664e-06
+iteration 58 	loss: 380751.071696 	improvement:  0.000130392168272
+iteration 59 	loss: 380755.739231 	improvement:  -1.22587590133e-05
+iteration 60 	loss: 380757.881617 	improvement:  -5.62666683198e-06
+iteration 61 	loss: 380756.752336 	improvement:  2.9658772793e-06
+iteration 62 	loss: 380775.977243 	improvement:  -5.04913091785e-05
+iteration 63 	loss: 380767.907916 	improvement:  2.11917953633e-05
+iteration 64 	loss: 380803.518681 	improvement:  -9.3523546338e-05
+iteration 65 	loss: 380823.27423 	improvement:  -5.18785883922e-05
+iteration 66 	loss: 380812.393037 	improvement:  2.85728144267e-05
+iteration 67 	loss: 380820.646099 	improvement:  -2.16722503387e-05
+iteration 68 	loss: 380760.909095 	improvement:  0.000156863878248
+iteration 69 	loss: 380760.283206 	improvement:  1.64378553326e-06
+iteration 70 	loss: 380769.878677 	improvement:  -2.520081996e-05
+iteration 71 	loss: 380791.238848 	improvement:  -5.60973226459e-05
+iteration 72 	loss: 380773.341666 	improvement:  4.69999846719e-05
+iteration 73 	loss: 380783.025896 	improvement:  -2.54330568382e-05
+iteration 74 	loss: 380784.981206 	improvement:  -5.13497281649e-06
+iteration 75 	loss: 380809.888381 	improvement:  -6.54100767817e-05
+iteration 76 	loss: 380803.462522 	improvement:  1.68741927746e-05
+iteration 77 	loss: 380792.74585 	improvement:  2.81422632111e-05
+iteration 78 	loss: 380813.000954 	improvement:  -5.31919354365e-05
+iteration 79 	loss: 380771.59805 	improvement:  0.000108722399604
+iteration 80 	loss: 380783.068374 	improvement:  -3.01238944127e-05
+iteration 81 	loss: 380768.186377 	improvement:  3.90826108381e-05
+iteration 82 	loss: 380766.064017 	improvement:  5.57389110476e-06
+iteration 83 	loss: 380750.481244 	improvement:  4.09247934403e-05
+iteration 84 	loss: 380788.312007 	improvement:  -9.93584106824e-05
+iteration 85 	loss: 380766.653907 	improvement:  5.68770074477e-05
+iteration 86 	loss: 380792.282948 	improvement:  -6.73090471894e-05
+iteration 87 	loss: 380796.61938 	improvement:  -1.13879206517e-05
+iteration 88 	loss: 380806.956799 	improvement:  -2.71468242702e-05
+iteration 89 	loss: 380749.547904 	improvement:  0.000150755899124
+iteration 90 	loss: 380776.713347 	improvement:  -7.13472760178e-05
+iteration 91 	loss: 380741.014678 	improvement:  9.3752238852e-05
+iteration 92 	loss: 380735.837274 	improvement:  1.35982304333e-05
+iteration 93 	loss: 380792.126213 	improvement:  -0.000147842503621
+iteration 94 	loss: 380765.945067 	improvement:  6.87544314489e-05
+iteration 95 	loss: 380800.112517 	improvement:  -8.97334712011e-05
+iteration 96 	loss: 380833.115267 	improvement:  -8.66668608757e-05
+iteration 97 	loss: 380807.323118 	improvement:  6.77255955351e-05
+iteration 98 	loss: 380827.286585 	improvement:  -5.24240628792e-05
+iteration 99 	loss: 380820.470966 	improvement:  1.78968757336e-05
+iteration 100 	loss: 380755.943317 	improvement:  0.000169443752586
+--- Execution Time ---
+--- 108.263215065 seconds ---
+
+
+
+
+
+### parse-logit
+
+python bismarck_front.py sparse-logit-spec.py
+A shuffled table __bismarck_shuffled_dblife_22 is created for training
+iteration 1 	loss: 5544.09886242 	improvement:  None
+iteration 2 	loss: 4824.5631899 	improvement:  0.129784062366
+iteration 3 	loss: 4471.74782179 	improvement:  0.0731289764929
+iteration 4 	loss: 4244.97159084 	improvement:  0.0507131081611
+iteration 5 	loss: 4085.68933318 	improvement:  0.0375225732955
+iteration 6 	loss: 3967.19779623 	improvement:  0.0290016022492
+iteration 7 	loss: 3876.71373734 	improvement:  0.0228080533245
+iteration 8 	loss: 3805.68108653 	improvement:  0.0183229032685
+iteration 9 	loss: 3748.87121349 	improvement:  0.014927649414
+iteration 10 	loss: 3702.9186384 	improvement:  0.0122577097157
+iteration 11 	loss: 3665.44430602 	improvement:  0.0101202149005
+iteration 12 	loss: 3634.89319918 	improvement:  0.00833489866174
+iteration 13 	loss: 3609.62630545 	improvement:  0.00695120663706
+iteration 14 	loss: 3588.49473345 	improvement:  0.00585422706184
+iteration 15 	loss: 3570.71947154 	improvement:  0.00495340336939
+iteration 16 	loss: 3555.75272696 	improvement:  0.00419152070025
+iteration 17 	loss: 3543.07854139 	improvement:  0.00356441702806
+iteration 18 	loss: 3532.29312116 	improvement:  0.00304408160975
+iteration 19 	loss: 3523.02209828 	improvement:  0.00262464709561
+iteration 20 	loss: 3515.03703369 	improvement:  0.00226653832161
+iteration 21 	loss: 3508.12855714 	improvement:  0.00196540647726
+iteration 22 	loss: 3502.14526319 	improvement:  0.00170555150766
+iteration 23 	loss: 3496.94280676 	improvement:  0.00148550560768
+iteration 24 	loss: 3492.3968498 	improvement:  0.00129998035673
+iteration 25 	loss: 3488.41232897 	improvement:  0.0011409129614
+iteration 26 	loss: 3484.9040171 	improvement:  0.00100570446865
+iteration 27 	loss: 3481.81497741 	improvement:  0.000886405959152
+iteration 28 	loss: 3479.0880595 	improvement:  0.000783188633178
+iteration 29 	loss: 3476.67273568 	improvement:  0.000694240497125
+iteration 30 	loss: 3474.52942568 	improvement:  0.000616483104299
+iteration 31 	loss: 3472.62716629 	improvement:  0.000547486911031
+iteration 32 	loss: 3470.93791216 	improvement:  0.000486448458371
+iteration 33 	loss: 3469.43834236 	improvement:  0.000432035905046
+iteration 34 	loss: 3468.10611024 	improvement:  0.000383990718375
+iteration 35 	loss: 3466.91713173 	improvement:  0.000342832216964
+iteration 36 	loss: 3465.85777822 	improvement:  0.000305560667146
+iteration 37 	loss: 3464.91078641 	improvement:  0.000273234469328
+iteration 38 	loss: 3464.06417755 	improvement:  0.000244337851249
+iteration 39 	loss: 3463.30752852 	improvement:  0.000218428122984
+iteration 40 	loss: 3462.63152262 	improvement:  0.00019519083668
+iteration 41 	loss: 3462.02617599 	improvement:  0.000174822712193
+iteration 42 	loss: 3461.48400911 	improvement:  0.000156603922472
+iteration 43 	loss: 3460.99849468 	improvement:  0.000140261929962
+iteration 44 	loss: 3460.56407798 	improvement:  0.000125517738944
+iteration 45 	loss: 3460.17448731 	improvement:  0.00011258010503
+iteration 46 	loss: 3459.8257728 	improvement:  0.000100779459148
+iteration 47 	loss: 3459.51322062 	improvement:  9.03375483782e-05
+iteration 48 	loss: 3459.23258309 	improvement:  8.11205236007e-05
+iteration 49 	loss: 3458.98067752 	improvement:  7.28212300442e-05
+iteration 50 	loss: 3458.75466125 	improvement:  6.53418717887e-05
+iteration 51 	loss: 3458.5513061 	improvement:  5.87943265066e-05
+iteration 52 	loss: 3458.36835209 	improvement:  5.28990303563e-05
+iteration 53 	loss: 3458.20376533 	improvement:  4.75908696656e-05
+iteration 54 	loss: 3458.05579474 	improvement:  4.27882812903e-05
+iteration 55 	loss: 3457.92271806 	improvement:  3.84830917542e-05
+iteration 56 	loss: 3457.80301777 	improvement:  3.4616241608e-05
+iteration 57 	loss: 3457.69535775 	improvement:  3.11353836083e-05
+iteration 58 	loss: 3457.59851744 	improvement:  2.80071823369e-05
+iteration 59 	loss: 3457.51140762 	improvement:  2.51937354441e-05
+iteration 60 	loss: 3457.43304881 	improvement:  2.26633555127e-05
+iteration 61 	loss: 3457.36255016 	improvement:  2.0390460421e-05
+iteration 62 	loss: 3457.29912549 	improvement:  1.83448112804e-05
+iteration 63 	loss: 3457.24206576 	improvement:  1.65041358438e-05
+iteration 64 	loss: 3457.1907262 	improvement:  1.48498598603e-05
+iteration 65 	loss: 3457.14453345 	improvement:  1.33613549117e-05
+iteration 66 	loss: 3457.10297124 	improvement:  1.20221209231e-05
+iteration 67 	loss: 3457.06557475 	improvement:  1.08172897138e-05
+iteration 68 	loss: 3457.03192458 	improvement:  9.7337372845e-06
+iteration 69 	loss: 3457.00164412 	improvement:  8.75909377191e-06
+iteration 70 	loss: 3456.97439538 	improvement:  7.88218771796e-06
+iteration 71 	loss: 3456.94987507 	improvement:  7.09299884973e-06
+iteration 72 	loss: 3456.92780941 	improvement:  6.38298479793e-06
+iteration 73 	loss: 3456.90795295 	improvement:  5.7439605004e-06
+iteration 74 	loss: 3456.89008547 	improvement:  5.16863050262e-06
+iteration 75 	loss: 3456.87400859 	improvement:  4.65067743333e-06
+iteration 76 	loss: 3456.85954083 	improvement:  4.18521599684e-06
+iteration 77 	loss: 3456.84652088 	improvement:  3.76640868283e-06
+iteration 78 	loss: 3456.83480409 	improvement:  3.38944491733e-06
+iteration 79 	loss: 3456.82425997 	improvement:  3.05022281875e-06
+iteration 80 	loss: 3456.81477083 	improvement:  2.74504756858e-06
+iteration 81 	loss: 3456.80623105 	improvement:  2.47041872546e-06
+iteration 82 	loss: 3456.79854561 	improvement:  2.22327614458e-06
+iteration 83 	loss: 3456.79162902 	improvement:  2.00086680737e-06
+iteration 84 	loss: 3456.78540432 	improvement:  1.80071382033e-06
+iteration 85 	loss: 3456.7798023 	improvement:  1.62058865817e-06
+iteration 86 	loss: 3456.77476063 	improvement:  1.45848616002e-06
+iteration 87 	loss: 3456.77022314 	improvement:  1.31263634281e-06
+iteration 88 	loss: 3456.76613951 	improvement:  1.18134419024e-06
+iteration 89 	loss: 3456.76246432 	improvement:  1.06318663216e-06
+iteration 90 	loss: 3456.75915672 	improvement:  9.56849214926e-07
+iteration 91 	loss: 3456.75617996 	improvement:  8.61141212006e-07
+iteration 92 	loss: 3456.75350094 	improvement:  7.75011325797e-07
+iteration 93 	loss: 3456.75108985 	improvement:  6.97500258404e-07
+iteration 94 	loss: 3456.7489199 	improvement:  6.27742155455e-07
+iteration 95 	loss: 3456.74696697 	improvement:  5.64961403148e-07
+iteration 96 	loss: 3456.74520932 	improvement:  5.08469618009e-07
+iteration 97 	loss: 3456.74362745 	improvement:  4.57620013738e-07
+iteration 98 	loss: 3456.74220377 	improvement:  4.11854566932e-07
+iteration 99 	loss: 3456.74092247 	improvement:  3.70666299284e-07
+iteration 100 	loss: 3456.73976931 	improvement:  3.33597392916e-07
+--- Execution Time ---
+--- 2.47576999664 seconds ---
+
+
+
+### sparse-svm
+
+python bismarck_front.py sparse-svm-spec.py
+A shuffled table __bismarck_shuffled_dblife_122 is created for training
+iteration 1 	loss: 6495.64427652 	improvement:  None
+iteration 2 	loss: 5369.56677107 	improvement:  0.17335886288
+iteration 3 	loss: 4897.87206143 	improvement:  0.0878459528967
+iteration 4 	loss: 4447.64548947 	improvement:  0.0919228935163
+iteration 5 	loss: 4302.68767964 	improvement:  0.0325920332842
+iteration 6 	loss: 4037.72944395 	improvement:  0.0615797044581
+iteration 7 	loss: 3827.00667468 	improvement:  0.052188432187
+iteration 8 	loss: 3682.49357981 	improvement:  0.0377613908597
+iteration 9 	loss: 3584.44551511 	improvement:  0.0266254543486
+iteration 10 	loss: 3425.46076387 	improvement:  0.0443540711041
+iteration 11 	loss: 3334.66282356 	improvement:  0.0265067815891
+iteration 12 	loss: 3272.0621043 	improvement:  0.0187727283295
+iteration 13 	loss: 3158.71926454 	improvement:  0.0346395747228
+iteration 14 	loss: 3128.13938712 	improvement:  0.00968110010952
+iteration 15 	loss: 3063.29179098 	improvement:  0.0207304049202
+iteration 16 	loss: 3038.79553798 	improvement:  0.00799670898941
+iteration 17 	loss: 2989.19795094 	improvement:  0.0163214623763
+iteration 18 	loss: 2940.61339369 	improvement:  0.0162533756676
+iteration 19 	loss: 2922.49703088 	improvement:  0.00616074280606
+iteration 20 	loss: 2888.77247535 	improvement:  0.0115396372279
+iteration 21 	loss: 2864.03872614 	improvement:  0.00856202744324
+iteration 22 	loss: 2844.10341839 	improvement:  0.00696055802889
+iteration 23 	loss: 2817.30253117 	improvement:  0.00942331669082
+iteration 24 	loss: 2810.38247597 	improvement:  0.00245626982859
+iteration 25 	loss: 2785.97231315 	improvement:  0.00868570845
+iteration 26 	loss: 2779.69444432 	improvement:  0.00225338521915
+iteration 27 	loss: 2761.78280879 	improvement:  0.0064437426077
+iteration 28 	loss: 2752.01864468 	improvement:  0.00353545690776
+iteration 29 	loss: 2740.23632868 	improvement:  0.00428133582207
+iteration 30 	loss: 2734.17135988 	improvement:  0.00221330136108
+iteration 31 	loss: 2726.14917173 	improvement:  0.00293404731952
+iteration 32 	loss: 2722.4494533 	improvement:  0.00135712251947
+iteration 33 	loss: 2715.60094128 	improvement:  0.00251556994467
+iteration 34 	loss: 2712.01729255 	improvement:  0.00131965219006
+iteration 35 	loss: 2709.32930327 	improvement:  0.000991140167899
+iteration 36 	loss: 2704.41402248 	improvement:  0.00181420574603
+iteration 37 	loss: 2700.78019597 	improvement:  0.00134366501826
+iteration 38 	loss: 2698.44126804 	improvement:  0.000866019354438
+iteration 39 	loss: 2696.04101435 	improvement:  0.000889496362213
+iteration 40 	loss: 2692.84538443 	improvement:  0.00118530463889
+iteration 41 	loss: 2691.07055422 	improvement:  0.000659091018557
+iteration 42 	loss: 2688.97641153 	improvement:  0.000778182009663
+iteration 43 	loss: 2687.36582079 	improvement:  0.00059896053025
+iteration 44 	loss: 2685.51536123 	improvement:  0.000688577471184
+iteration 45 	loss: 2683.84103424 	improvement:  0.00062346580256
+iteration 46 	loss: 2683.36387676 	improvement:  0.000177789024984
+iteration 47 	loss: 2681.59050218 	improvement:  0.000660877414069
+iteration 48 	loss: 2680.89682709 	improvement:  0.000258680469727
+iteration 49 	loss: 2680.00636836 	improvement:  0.000332149572554
+iteration 50 	loss: 2679.24401329 	improvement:  0.000284460168995
+iteration 51 	loss: 2678.30332781 	improvement:  0.000351101084833
+iteration 52 	loss: 2677.80932271 	improvement:  0.000184447034695
+iteration 53 	loss: 2677.31200754 	improvement:  0.000185717170477
+iteration 54 	loss: 2676.81165849 	improvement:  0.000186884846242
+iteration 55 	loss: 2676.22615931 	improvement:  0.000218730061598
+iteration 56 	loss: 2675.99235744 	improvement:  8.73625232032e-05
+iteration 57 	loss: 2675.58860339 	improvement:  0.000150880121857
+iteration 58 	loss: 2675.25736653 	improvement:  0.000123799622621
+iteration 59 	loss: 2675.0598865 	improvement:  7.38172087705e-05
+iteration 60 	loss: 2674.68973082 	improvement:  0.0001383728583
+iteration 61 	loss: 2674.50818868 	improvement:  6.78740935026e-05
+iteration 62 	loss: 2674.33318956 	improvement:  6.54322605145e-05
+iteration 63 	loss: 2674.18941199 	improvement:  5.37620253794e-05
+iteration 64 	loss: 2673.95202834 	improvement:  8.87684496003e-05
+iteration 65 	loss: 2673.77473316 	improvement:  6.63045481335e-05
+iteration 66 	loss: 2673.73836696 	improvement:  1.36010726517e-05
+iteration 67 	loss: 2673.56066367 	improvement:  6.64624813094e-05
+iteration 68 	loss: 2673.46772794 	improvement:  3.47610335956e-05
+iteration 69 	loss: 2673.34199388 	improvement:  4.70303255752e-05
+iteration 70 	loss: 2673.30606222 	improvement:  1.34407283103e-05
+iteration 71 	loss: 2673.19589959 	improvement:  4.12083857164e-05
+iteration 72 	loss: 2673.16988815 	improvement:  9.73046742441e-06
+iteration 73 	loss: 2673.08314463 	improvement:  3.24496834357e-05
+iteration 74 	loss: 2673.01626067 	improvement:  2.50212796164e-05
+iteration 75 	loss: 2672.9816817 	improvement:  1.2936311963e-05
+iteration 76 	loss: 2672.9367968 	improvement:  1.67920709548e-05
+iteration 77 	loss: 2672.90593142 	improvement:  1.15473652901e-05
+iteration 78 	loss: 2672.86019468 	improvement:  1.71112433746e-05
+iteration 79 	loss: 2672.83756701 	improvement:  8.46571129498e-06
+iteration 80 	loss: 2672.8073576 	improvement:  1.13023764456e-05
+iteration 81 	loss: 2672.78085806 	improvement:  9.91449469589e-06
+iteration 82 	loss: 2672.76320106 	improvement:  6.60622993333e-06
+iteration 83 	loss: 2672.73839023 	improvement:  9.28283938141e-06
+iteration 84 	loss: 2672.71677794 	improvement:  8.08619637782e-06
+iteration 85 	loss: 2672.69101591 	improvement:  9.63889148039e-06
+iteration 86 	loss: 2672.68372156 	improvement:  2.7292169863e-06
+iteration 87 	loss: 2672.67583249 	improvement:  2.95173981363e-06
+iteration 88 	loss: 2672.66229512 	improvement:  5.06509999646e-06
+iteration 89 	loss: 2672.64652646 	improvement:  5.89998098478e-06
+iteration 90 	loss: 2672.64137278 	improvement:  1.92830867803e-06
+iteration 91 	loss: 2672.63110002 	improvement:  3.84367223173e-06
+iteration 92 	loss: 2672.61828082 	improvement:  4.79647041829e-06
+iteration 93 	loss: 2672.61664752 	improvement:  6.11126377939e-07
+iteration 94 	loss: 2672.60883134 	improvement:  2.92454003745e-06
+iteration 95 	loss: 2672.60326453 	improvement:  2.08291171693e-06
+iteration 96 	loss: 2672.59819564 	improvement:  1.89661403084e-06
+iteration 97 	loss: 2672.59139704 	improvement:  2.54381516121e-06
+iteration 98 	loss: 2672.58859813 	improvement:  1.04726422572e-06
+iteration 99 	loss: 2672.58461632 	improvement:  1.48986889062e-06
+iteration 100 	loss: 2672.58052001 	improvement:  1.53271616744e-06
+--- Execution Time ---
+--- 2.19888401031 seconds --
