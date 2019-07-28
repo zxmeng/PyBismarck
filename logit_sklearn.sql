@@ -8,21 +8,21 @@ $$ LANGUAGE plpythonu;
 
 
 DROP FUNCTION IF EXISTS dense_logit_agg(double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_agg(x double precision[], y integer, linear_model double precision[])
+CREATE FUNCTION dense_logit_agg(x double precision[][], y integer[], linear_model double precision[])
     RETURNS double precision[]
 AS $$
     import numpy as np
     from sklearn.linear_model import LogisticRegression
-    from sklearn.linear_model import SGDRegressor
+    from sklearn.linear_model import SGDClassifier
 
     mu = linear_model[0]
     lr = linear_model[1]
     w = linear_model[2:]
 
     # model = LogisticRegression(penalty='l1', C=mu, random_state=0, max_iter=1)
-    model = SGDRegressor(loss='squared_loss', penalty='l1', random_state=0, warm_start=True)
+    model = SGDClassifier(loss='log', penalty='l1', classes=[-1,1], random_state=0, warm_start=True)
 
-    model.partial_fit([x], [y])
+    model.partial_fit(x, y)
     w = model.coef_
     lr = model.intercept_[0]
     print(model.coef_)
@@ -49,24 +49,40 @@ RETURNS double precision
 AS $$
 DECLARE
     weight_vector double precision[];
-    loss double precision;
+    loss double precision := 0.0;
+    loss_epo double precision;
+    length integer := 5000;
+    offset integer;
+    iteration integer := 101;
+
     BEGIN
     -- grad
-    EXECUTE 'SELECT dense_logit_agg(vec, labeli, 
-                            (SELECT parms 
-                             FROM linear_model 
-                             WHERE mid = ' || model_id || ')) '
-            || 'FROM ' || quote_ident(data_table)
-        INTO weight_vector;
-    -- update
-    UPDATE linear_model SET parms = weight_vector WHERE mid = model_id;
-    -- loss
-    EXECUTE 'SELECT sum(dense_logit_loss(vec, labeli, 
-                           (SELECT parms
-                            FROM linear_model 
-                            WHERE mid = ' || model_id || '))) '
-            || 'FROM ' || quote_ident(data_table)
-        INTO loss;
+    offset := (i-1) * length;
+    FOR i IN 1..iteration LOOP
+        EXECUTE 'SELECT dense_logit_agg(
+                    (SELECT vec 
+                     FROM ' || quote_ident(data_table)
+                || 'LIMIT ' || length 
+                || 'OFFSET ' || offset || '), 
+                    (SELECT labeli
+                     FROM ' || quote_ident(data_table)
+                || 'LIMIT ' || length 
+                || 'OFFSET ' || offset || '), 
+                    (SELECT parms 
+                     FROM linear_model 
+                     WHERE mid = ' || model_id || ')) '            
+            INTO weight_vector;
+        -- update
+        UPDATE linear_model SET parms = weight_vector WHERE mid = model_id;
+        -- loss
+        EXECUTE 'SELECT sum(dense_logit_loss(vec, labeli, 
+                               (SELECT parms
+                                FROM linear_model 
+                                WHERE mid = ' || model_id || '))) '
+                || 'FROM ' || quote_ident(data_table)
+            INTO loss_epo;
+        loss := loss_epo + loss;
+    END LOOP;
     RETURN loss;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
