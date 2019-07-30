@@ -6,33 +6,8 @@ AS $$
     return [mu, 0.0] + w
 $$ LANGUAGE plpythonu;
 
-DROP TYPE dataset CASCADE;
-CREATE TYPE dataset AS (
-    vec double precision[],
-    labeli Integer
-); 
-
-DROP TYPE datavec CASCADE;
-CREATE TYPE datavec AS (
-    vec double precision[]
-); 
-
-DROP TYPE datalabel CASCADE;
-CREATE TYPE datalabel AS (
-    labeli Integer
-); 
-
-DROP FUNCTION IF EXISTS get_dataset(text, integer, integer) CASCADE;
-CREATE FUNCTION get_dataset(data_table text, length integer, shift integer)
-  RETURNS dataset 
-AS $$
-BEGIN
-RETURN QUERY EXECUTE 'SELECT vec, labeli FROM ' || data_table || ' LIMIT ' || length || ' OFFSET ' || shift;
-END;
-$$ LANGUAGE plpgsql;
-
-DROP FUNCTION IF EXISTS dense_logit_agg(dataset, double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_agg(data dataset, linear_model double precision[])
+DROP FUNCTION IF EXISTS dense_logit_agg(double precision[][], integer[], double precision[]) CASCADE;
+CREATE FUNCTION dense_logit_agg(datax double precision[][], datay integer[], linear_model double precision[])
     RETURNS double precision[]
 AS $$
     import numpy as np
@@ -43,9 +18,8 @@ AS $$
     w = linear_model[2:]
     wa = np.array(w)
 
-    datax = pd.DataFrame(data)
-    x = np.array(list(datax["vec"]))
-    y = np.array(list(datax["labeli"]))
+    x = np.array(datax)
+    y = np.array(datay)
 
     z = np.dot(x, w) 
     h = 1 / (1 + np.exp(-z))
@@ -57,16 +31,15 @@ AS $$
 
 $$ LANGUAGE plpythonu;
 
-DROP FUNCTION IF EXISTS dense_logit_loss(dataset, double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_loss(data dataset, linear_model double precision[])
+DROP FUNCTION IF EXISTS dense_logit_loss(double precision[][], integer[], double precision[]) CASCADE;
+CREATE FUNCTION dense_logit_loss(datax double precision[][], datay integer[], linear_model double precision[])
     RETURNS double precision
 AS $$
     import numpy as np
     import pandas as pd
 
-    datax = pd.DataFrame(data)
-    x = np.array(list(datax["vec"]))
-    y = np.array(list(datax["labeli"]))
+    x = np.array(datax)
+    y = np.array(datay)
     
     w = linear_model[2:]
     z = np.dot(x, w) 
@@ -97,30 +70,29 @@ DECLARE
         --          FROM linear_model
         --          WHERE mid = ' || model_id  
         --     INTO weight_vector;
-        -- EXECUTE 'SELECT *
-        --          FROM dense_logit_agg(
-        --             (SELECT vec
-        --              FROM ' || quote_ident(data_table)
-        --          || ' LIMIT ' || length 
-        --          || ' OFFSET ' || shift 
-        --          || '), 
-        --             (SELECT labeli
-        --              FROM ' || quote_ident(data_table)
-        --          || ' LIMIT ' || length 
-        --          || ' OFFSET ' || shift 
-        --          || '),
-        --             (SELECT parms              
-        --              FROM linear_model
-        --              WHERE mid = ' || model_id || '))' 
-        --     INTO weight_vector;
+
+        EXECUTE 'SELECT labeli, dense_logit_agg(vec, labeli)'
+
+
         EXECUTE 'SELECT *
                  FROM dense_logit_agg(
-                    get_dataset(' || quote_ident(data_table), length, shift || '),
+                    (SELECT vec, labeli
+                     FROM ' || quote_ident(data_table)
+                 || ' LIMIT ' || length 
+                 || ' OFFSET ' || shift 
+                 || ' GROUP BY labeli),
                     (SELECT parms              
                      FROM linear_model
                      WHERE mid = ' || model_id || '))' 
             INTO weight_vector;
-        RAISE NOTICE 'weights: %', weight_vector;
+        -- EXECUTE 'SELECT *
+        --          FROM dense_logit_agg(
+        --             get_dataset(' || quote_ident(data_table), length, shift || '),
+        --             (SELECT parms              
+        --              FROM linear_model
+        --              WHERE mid = ' || model_id || '))' 
+        --     INTO weight_vector;
+        -- RAISE NOTICE 'weights: %', weight_vector;
         -- update
         UPDATE linear_model SET parms = weight_vector WHERE mid = model_id;
         -- loss
@@ -133,29 +105,29 @@ DECLARE
         --          FROM linear_model
         --          WHERE mid = ' || model_id  
         --     INTO loss_epo;
-        EXECUTE 'SELECT *
-                 FROM dense_logit_loss(
-                    get_dataset(' || quote_ident(data_table), length, shift || '),
-                    (SELECT parms              
-                     FROM linear_model
-                     WHERE mid = ' || model_id || '))' 
-            INTO loss_epo;
         -- EXECUTE 'SELECT *
         --          FROM dense_logit_loss(
-        --             (SELECT vec
-        --              FROM ' || quote_ident(data_table)
-        --          || ' LIMIT ' || length 
-        --          || ' OFFSET ' || shift 
-        --          || '), 
-        --             (SELECT labeli
-        --              FROM ' || quote_ident(data_table)
-        --          || ' LIMIT ' || length 
-        --          || ' OFFSET ' || shift 
-        --          || '),
+        --             get_dataset(' || quote_ident(data_table), length, shift || '),
         --             (SELECT parms              
-        --             FROM linear_model
-        --             WHERE mid = ' || model_id || '))' 
+        --              FROM linear_model
+        --              WHERE mid = ' || model_id || '))' 
         --     INTO loss_epo;
+        EXECUTE 'SELECT *
+                 FROM dense_logit_loss(
+                    (SELECT vec
+                     FROM ' || quote_ident(data_table)
+                 || ' LIMIT ' || length 
+                 || ' OFFSET ' || shift 
+                 || '), 
+                    (SELECT labeli
+                     FROM ' || quote_ident(data_table)
+                 || ' LIMIT ' || length 
+                 || ' OFFSET ' || shift 
+                 || '),
+                    (SELECT parms              
+                    FROM linear_model
+                    WHERE mid = ' || model_id || '))' 
+            INTO loss_epo;
         loss := loss_epo + loss;
     END LOOP;
     RETURN loss;
@@ -218,5 +190,5 @@ CREATE FUNCTION dense_logit(
     model_id integer,
     ndims integer)
 RETURNS VOID AS $$
-    SELECT dense_logit($1, $2, $3, 20, 1e-2, 5e-5, '');
+    SELECT dense_logit($1, $2, $3, 20, 1e-2, 5e-5, 'f');
 $$ LANGUAGE sql VOLATILE;

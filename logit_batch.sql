@@ -7,61 +7,109 @@ AS $$
 $$ LANGUAGE plpythonu;
 
 
-DROP FUNCTION IF EXISTS dense_logit_transit(double precision[], double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_transit(state double precision[], x double precision[], y integer, linear_model double precision[])
+DROP FUNCTION IF EXISTS dense_logit_transit(double precision[][], double precision[], integer, double precision[]) CASCADE;
+CREATE FUNCTION dense_logit_transit(state double precision[][], x double precision[], y integer, linear_model double precision[])
     RETURNS double precision[]
 AS $$
-    import numpy as np
-
-    if state:
-        mu = state[0]
-        lr = state[1]
-        w = state[2:]
+    if not state:
+        state = [linear_model] + [x + [y]]
     else:
-        mu = linear_model[0]
-        lr = linear_model[1]
-        w = linear_model[2:]
-    
-    z = np.dot(x, w) 
-    h = 1 / (1 + np.exp(-z))
-
-    gradient = np.dot(x, (h - y))
-    for i in range(len(w)):
-        w[i] -= lr * gradient[i]
-
-    return [mu, lr] + w
+        state += [x + [y]]
+    return state
+   
 
 $$ LANGUAGE plpythonu;
 
-DROP FUNCTION IF EXISTS dense_logit_final(double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_final(linear_model double precision[])
+DROP FUNCTION IF EXISTS dense_logit_final(double precision[][]) CASCADE;
+CREATE FUNCTION dense_logit_final(state double precision[][])
     RETURNS double precision[]
 AS $$
-    return linear_model
+    global state
+    linear_model = state[0]
+    mu = linear_model[0]
+    lr = linear_model[1]
+    w = linear_model[2:]
+    wa = np.array(w)
+
+    state = np.array(state[1:])
+    x = state[:, :-1]
+    y = s[:, -1]
+
+    z = np.dot(x, w) 
+    h = 1 / (1 + np.exp(-z))
+
+    gradient = np.dot(x.T, (h - y)) / len(y)
+    wa -= lr * gradient
+
+    return [mu, lr] + list(wa)
+    
 $$ LANGUAGE plpythonu;
 
 
 CREATE AGGREGATE dense_logit_agg(double precision[], integer, double precision[]) (
-    STYPE = double precision[],
+    STYPE = double precision[][],
     SFUNC = dense_logit_transit,
     FINALFUNC = dense_logit_final
     );
 
 
-DROP FUNCTION IF EXISTS dense_logit_loss(double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_loss(x double precision[], y integer, linear_model double precision[])
-    RETURNS double precision
+DROP FUNCTION IF EXISTS dense_logit_loss_transit(double precision[][], double precision[], integer, double precision[]) CASCADE;
+CREATE FUNCTION dense_logit_loss_transit(state double precision[][], x double precision[], y integer, linear_model double precision[])
+    RETURNS double precision[]
 AS $$
-    import numpy as np
-    
-    w = linear_model[2:]
-
-    z = np.dot(x, w)
-    h = 1 / (1 + np.exp(-z))
-
-    return np.log(1.0 + np.exp(- y * z))
+    if not state:
+        state = [linear_model] + [x + [y]]
+    else:
+        state += [x + [y]]
+    return state
+   
 
 $$ LANGUAGE plpythonu;
+
+DROP FUNCTION IF EXISTS dense_logit_loss_final(double precision[][]) CASCADE;
+CREATE FUNCTION dense_logit_loss_final(state double precision[][])
+    RETURNS double precision
+AS $$
+    global state
+    linear_model = state[0]
+    mu = linear_model[0]
+    lr = linear_model[1]
+    w = linear_model[2:]
+    wa = np.array(w)
+
+    state = np.array(state[1:])
+    x = state[:, :-1]
+    y = s[:, -1]
+
+    z = np.dot(x, w) 
+    h = 1 / (1 + np.exp(-z))
+
+    return (-y * np.log(h) - (1 - y) * np.log(1 - h)).mean()
+    
+$$ LANGUAGE plpythonu;
+
+
+CREATE AGGREGATE dense_logit_loss(double precision[], integer, double precision[]) (
+    STYPE = double precision[][],
+    SFUNC = dense_logit_loss_transit,
+    FINALFUNC = dense_logit_loss_final
+    );
+
+
+-- DROP FUNCTION IF EXISTS dense_logit_loss(double precision[], integer, double precision[]) CASCADE;
+-- CREATE FUNCTION dense_logit_loss(x double precision[], y integer, linear_model double precision[])
+--     RETURNS double precision
+-- AS $$
+--     import numpy as np
+    
+--     w = linear_model[2:]
+
+--     z = np.dot(x, w)
+--     h = 1 / (1 + np.exp(-z))
+
+--     return np.log(1.0 + np.exp(- y * z))
+
+-- $$ LANGUAGE plpythonu;
 
 
 DROP FUNCTION IF EXISTS dense_logit_agg_iteration(text, integer) CASCADE;
@@ -82,10 +130,10 @@ DECLARE
     -- update
     UPDATE linear_model SET parms = weight_vector WHERE mid = model_id;
     -- loss
-    EXECUTE 'SELECT sum(dense_logit_loss(vec, labeli, 
+    EXECUTE 'SELECT dense_logit_loss(vec, labeli, 
                            (SELECT parms
                             FROM linear_model 
-                            WHERE mid = ' || model_id || '))) '
+                            WHERE mid = ' || model_id || ')) '
             || 'FROM ' || quote_ident(data_table)
         INTO loss;
     RETURN loss;

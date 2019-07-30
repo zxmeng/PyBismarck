@@ -7,15 +7,20 @@ AS $$
 $$ LANGUAGE plpythonu;
 
 
-DROP FUNCTION IF EXISTS sparse_logit_agg(integer[], double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION sparse_logit_agg(k integer[], v double precision[], y integer, linear_model double precision[])
+DROP FUNCTION IF EXISTS sparse_logit_transit(double precision[], integer[], double precision[], integer, double precision[]) CASCADE;
+CREATE FUNCTION sparse_logit_transit(state double precision[], k integer[], v double precision[], y integer, linear_model double precision[])
     RETURNS double precision[]
 AS $$
     import numpy as np
 
-    mu = linear_model[0]
-    lr = linear_model[1]
-    w = linear_model[2:]
+    if state:
+        mu = state[0]
+        lr = state[1]
+        w = state[2:]
+    else:
+        mu = linear_model[0]
+        lr = linear_model[1]
+        w = linear_model[2:]
 
     wx = 0.0
     for i in range(len(k)):
@@ -37,6 +42,19 @@ AS $$
             
     return [mu, lr] + w
 $$ LANGUAGE plpythonu;
+
+DROP FUNCTION IF EXISTS sparse_logit_final(double precision[]) CASCADE;
+CREATE FUNCTION sparse_logit_final(linear_model double precision[])
+    RETURNS double precision[]
+AS $$
+    return linear_model
+$$ LANGUAGE plpythonu;
+
+CREATE AGGREGATE sparse_logit_agg(integer[], double precision[], integer, double precision[]) (
+    STYPE = double precision[],
+    SFUNC = sparse_logit_transit,
+    FINALFUNC = sparse_logit_final
+    );
 
 DROP FUNCTION IF EXISTS sparse_logit_loss(integer[], double precision[], integer, double precision[]) CASCADE;
 CREATE FUNCTION sparse_logit_loss(k integer[], v double precision[], y integer, linear_model double precision[])
