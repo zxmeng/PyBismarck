@@ -7,8 +7,8 @@ AS $$
 $$ LANGUAGE plpythonu;
 
 
-DROP FUNCTION IF EXISTS dense_logit_transit(double precision[][], double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_transit(state double precision[][], x double precision[], y integer, linear_model double precision[])
+DROP FUNCTION IF EXISTS dense_svm_transit(double precision[][], double precision[], integer, double precision[]) CASCADE;
+CREATE FUNCTION dense_svm_transit(state double precision[][], x double precision[], y integer, linear_model double precision[])
     RETURNS double precision[]
 AS $$
     if not state:
@@ -20,8 +20,8 @@ AS $$
 
 $$ LANGUAGE plpythonu;
 
-DROP FUNCTION IF EXISTS dense_logit_final(double precision[][]) CASCADE;
-CREATE FUNCTION dense_logit_final(state double precision[][])
+DROP FUNCTION IF EXISTS dense_svm_final(double precision[][]) CASCADE;
+CREATE FUNCTION dense_svm_final(state double precision[][])
     RETURNS double precision[]
 AS $$
     # from sklearn.linear_model import LogisticRegression
@@ -39,25 +39,26 @@ AS $$
     y = state[:, -1]
 
     # clf = LogisticRegression(random_state=0, penalty='l1', max_iter=10, warm_start=True)
-    clf = SGDClassifier(loss='log', penalty='l1', alpha=mu, max_iter=10, random_state=0, warm_start=True)
+    clf = SGDClassifier(loss='hinge', penalty='l1', alpha=mu, max_iter=10, random_state=0, warm_start=True)
+    clf.partial_fit(x, y, classes=[-1, 1])
     clf.coef_[0] = wa[:-1]
     clf.intercept_[0] = wa[-1]
-    clf.partial_fit(x, y, classes=[-1, 1])
+    clf.partial_fit(x, y)
     
     return [mu, lr] + list(clf.coef_[0]) + list(clf.intercept_)
     
 $$ LANGUAGE plpythonu;
 
 
-CREATE AGGREGATE dense_logit_agg(double precision[], integer, double precision[]) (
+CREATE AGGREGATE dense_svm_agg(double precision[], integer, double precision[]) (
     STYPE = double precision[][],
-    SFUNC = dense_logit_transit,
-    FINALFUNC = dense_logit_final
+    SFUNC = dense_svm_transit,
+    FINALFUNC = dense_svm_final
     );
 
 
-DROP FUNCTION IF EXISTS dense_logit_loss_transit(double precision[][], double precision[], integer, double precision[]) CASCADE;
-CREATE FUNCTION dense_logit_loss_transit(state double precision[][], x double precision[], y integer, linear_model double precision[])
+DROP FUNCTION IF EXISTS dense_svm_loss_transit(double precision[][], double precision[], integer, double precision[]) CASCADE;
+CREATE FUNCTION dense_svm_loss_transit(state double precision[][], x double precision[], y integer, linear_model double precision[])
     RETURNS double precision[]
 AS $$
     if not state:
@@ -69,8 +70,8 @@ AS $$
 
 $$ LANGUAGE plpythonu;
 
-DROP FUNCTION IF EXISTS dense_logit_loss_final(double precision[][]) CASCADE;
-CREATE FUNCTION dense_logit_loss_final(state double precision[][])
+DROP FUNCTION IF EXISTS dense_svm_loss_final(double precision[][]) CASCADE;
+CREATE FUNCTION dense_svm_loss_final(state double precision[][])
     RETURNS double precision
 AS $$
     from sklearn.linear_model import SGDClassifier
@@ -86,7 +87,7 @@ AS $$
     x = state[:, :-1]
     y = state[:, -1]
 
-    clf = SGDClassifier(loss='log', penalty='l1', alpha=mu, max_iter=10, random_state=0, warm_start=True)
+    clf = SGDClassifier(loss='hinge', penalty='l1', alpha=mu, max_iter=10, random_state=0, warm_start=True)
     clf.coef_[0] = wa[:-1]
     clf.intercept_[0] = wa[-1]
 
@@ -95,15 +96,15 @@ AS $$
 $$ LANGUAGE plpythonu;
 
 
-CREATE AGGREGATE dense_logit_loss(double precision[], integer, double precision[]) (
+CREATE AGGREGATE dense_svm_loss(double precision[], integer, double precision[]) (
     STYPE = double precision[][],
-    SFUNC = dense_logit_loss_transit,
-    FINALFUNC = dense_logit_loss_final
+    SFUNC = dense_svm_loss_transit,
+    FINALFUNC = dense_svm_loss_final
     );
 
 
-DROP FUNCTION IF EXISTS dense_logit_agg_iteration(text, integer) CASCADE;
-CREATE FUNCTION dense_logit_agg_iteration(data_table text, model_id integer)
+DROP FUNCTION IF EXISTS dense_svm_agg_iteration(text, integer) CASCADE;
+CREATE FUNCTION dense_svm_agg_iteration(data_table text, model_id integer)
 RETURNS double precision 
 AS $$
 DECLARE
@@ -116,7 +117,7 @@ DECLARE
     FOR i IN 1..iteration LOOP
         shift := (i-1) * length;
         -- grad
-        EXECUTE 'SELECT dense_logit_agg(vec, labeli, 
+        EXECUTE 'SELECT dense_svm_agg(vec, labeli, 
                                 (SELECT parms 
                                  FROM linear_model 
                                  WHERE mid = ' || model_id || ')) '
@@ -129,7 +130,7 @@ DECLARE
     END LOOP;
     -- loss
     shift := iteration * length;
-    EXECUTE 'SELECT dense_logit_loss(vec, labeli, 
+    EXECUTE 'SELECT dense_svm_loss(vec, labeli, 
                            (SELECT parms
                             FROM linear_model 
                             WHERE mid = ' || model_id || ')) '
@@ -141,21 +142,21 @@ DECLARE
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
-CREATE FUNCTION dense_logit_train_agg(data_table text, model_id integer, iteration integer)
+CREATE FUNCTION dense_svm_train_agg(data_table text, model_id integer, iteration integer)
 RETURNS VOID 
 AS $$
 DECLARE
     loss double precision;
     BEGIN
     FOR i IN 1..iteration LOOP
-        SELECT dense_logit_agg_iteration(data_table, model_id) INTO loss;
+        SELECT dense_svm_agg_iteration(data_table, model_id) INTO loss;
         RAISE NOTICE '#iter: %, loss value: %', i, loss;
     END LOOP;
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
-DROP FUNCTION IF EXISTS dense_logit(text, integer, integer, integer, double precision, double precision, boolean) CASCADE;
-CREATE FUNCTION dense_logit(
+DROP FUNCTION IF EXISTS dense_svm(text, integer, integer, integer, double precision, double precision, boolean) CASCADE;
+CREATE FUNCTION dense_svm(
     data_table text,
     model_id integer,
     ndims integer,
@@ -187,15 +188,15 @@ BEGIN
         tmp_table := data_table;
     END IF;
 
-    PERFORM dense_logit_train_agg(tmp_table, model_id, iteration);
+    PERFORM dense_svm_train_agg(tmp_table, model_id, iteration);
 END;
 $$ LANGUAGE plpgsql VOLATILE;
 
-DROP FUNCTION IF EXISTS dense_logit(text, integer, integer) CASCADE;
-CREATE FUNCTION dense_logit(
+DROP FUNCTION IF EXISTS dense_svm(text, integer, integer) CASCADE;
+CREATE FUNCTION dense_svm(
     data_table text,
     model_id integer,
     ndims integer)
 RETURNS VOID AS $$
-    SELECT dense_logit($1, $2, $3, 3, 1e-2, 5e-5, 't');
+    SELECT dense_svm($1, $2, $3, 3, 1e-2, 5e-5, 't');
 $$ LANGUAGE sql VOLATILE;
