@@ -96,22 +96,6 @@ CREATE AGGREGATE dense_logit_loss(double precision[], integer, double precision[
     );
 
 
--- DROP FUNCTION IF EXISTS dense_logit_loss(double precision[], integer, double precision[]) CASCADE;
--- CREATE FUNCTION dense_logit_loss(x double precision[], y integer, linear_model double precision[])
---     RETURNS double precision
--- AS $$
---     import numpy as np
-    
---     w = linear_model[2:]
-
---     z = np.dot(x, w)
---     h = 1 / (1 + np.exp(-z))
-
---     return np.log(1.0 + np.exp(- y * z))
-
--- $$ LANGUAGE plpythonu;
-
-
 DROP FUNCTION IF EXISTS dense_logit_agg_iteration(text, integer) CASCADE;
 CREATE FUNCTION dense_logit_agg_iteration(data_table text, model_id integer)
 RETURNS double precision 
